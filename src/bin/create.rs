@@ -1,6 +1,5 @@
 use rand::Rng;
-use std::env;
-use std::fs;
+use std::{env, fs};
 use std::io::{self, Write};
 
 fn main() {
@@ -44,7 +43,7 @@ fn main() {
     });
 
     if let Err(error) = fs::write(&file_name, final_matrix.as_bytes()) {
-        panic!("Error while creating or writing to file: {error}");
+        panic!("Error while creating or writing to file '{file_name}': {error}");
     }
 
     println!("Created a matrix of size {size} in '{file_name}'!");
