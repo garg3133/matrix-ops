@@ -1,4 +1,6 @@
-fn calculate_determinant(matrix: &Vec<i32>, size: usize) -> i32 {
+use std::{env, fs};
+
+fn calculate_determinant(matrix: &Vec<i64>, size: usize) -> i64 {
     if size == 1 {
         return matrix[0];
     }
@@ -27,7 +29,28 @@ fn calculate_determinant(matrix: &Vec<i32>, size: usize) -> i32 {
 }
 
 fn main() {
-    let matrix = vec![6, 1, 1, 4, -2, 5, 2, 8, 7];
+    let mut argv_iter = env::args();
+
+    // ignore first argv (path to binary)
+    argv_iter.next();
+
+    let file_name = if let Some(value) = argv_iter.next() {
+        value
+    } else {
+        "matrix.txt".to_string()
+    };
+
+    let matrix = fs::read_to_string(&file_name).expect(format!("Error while reading file '{file_name}'").as_str());
+
+    // convert matrix to i64 vector
+    let matrix: Vec<i64> = matrix
+        .replace("\n", " ")
+        .split(' ')
+        .filter(|s| *s != "")
+        .map(|s| s.parse().expect(format!("Failed to parse to i32: '{s}'").as_str()))
+        .collect();
+
+    println!("Matrix provided: {matrix:?}");
 
     let size = matrix.len();
     let size_sqrt = (size as f64).sqrt() as usize;
