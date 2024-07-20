@@ -2,18 +2,55 @@ use rand::Rng;
 use std::{env, fs};
 use std::io::{self, Write};
 
-fn get_args() -> (String, u32) {
-    let mut args_iter = env::args();
-    // first item not useful to us
-    args_iter.next();
+const DEFAULT_MATRIX_FILENAME: &str = "matrix.txt";
 
-    let file_name = if let Some(value) = args_iter.next() {
+fn get_args() -> (String, u32) {
+    let mut argv_iter = env::args();
+
+    // ignore first argv (path to binary)
+    argv_iter.next();
+
+    let mut file_name: Option<String> = None;
+    let mut size: Option<String> = None;
+
+    // TODO: Improve error handling
+    loop {
+        let next_argv = argv_iter.next().unwrap_or("".to_string());
+        if next_argv == "" {
+            break;
+        }
+        
+        if next_argv == "--out" {
+            if let Some(_) = file_name {
+                // file_name already set
+                panic!("--out flag can only be passed once.");
+            }
+
+            let flag_value = argv_iter.next();
+
+            if let Some(value) = flag_value {
+                file_name = Some(value);
+            } else {
+                println!("No argument passed for --out, defaulting to: '{DEFAULT_MATRIX_FILENAME}'");
+                break;
+            }
+        } else {
+            if let Some(_) = size {
+                // size already set
+                panic!("Too many or wrong arguments passed");
+            } else {
+                size = Some(next_argv);
+            }
+        }
+    }
+
+    let file_name = if let Some(value) = file_name {
         value
     } else {
-        "matrix.txt".to_string()
+        DEFAULT_MATRIX_FILENAME.to_string()
     };
 
-    let size: String = if let Some(value) = args_iter.next() {
+    let size: String = if let Some(value) = size {
         value
     } else {
         let mut input = String::new();
