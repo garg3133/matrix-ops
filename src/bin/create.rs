@@ -2,7 +2,7 @@ use rand::Rng;
 use std::{env, fs};
 use std::io::{self, Write};
 
-fn main() {
+fn get_args() -> (String, u32) {
     let mut args_iter = env::args();
     // first item not useful to us
     args_iter.next();
@@ -29,6 +29,12 @@ fn main() {
     };
     let size: u32 = size.trim().parse().expect("Matrix size should be a number.");
 
+    (file_name, size)
+}
+
+fn main() {
+    let (file_name, size) = get_args();
+
     // random number generator (for matrix elements)
     let mut thread_rng = rand::thread_rng();
 
@@ -48,3 +54,4 @@ fn main() {
 
     println!("Created a matrix of size {size} in '{file_name}'!");
 }
+
