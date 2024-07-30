@@ -38,3 +38,16 @@ cargo run --bin determinant matrix1.txt
 cargo run --bin determinant
 ```
 
+### 3. Multiply two matrices
+
+**Usage:** `cargo run --bin multiply <matrix1-file-path> <matrix2-file-path>`
+
+```sh
+# multiply the matrices present in files `matrix1.txt`
+# and `matrix2.txt` in the same order.
+cargo run --bin multiply matrix1.txt matrix2.txt
+```
+
+**Note:** For the multiplication to work, the no. of columns in the first matrix
+should be equal to the number of rows in the second.
+
