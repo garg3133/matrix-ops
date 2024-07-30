@@ -10,10 +10,10 @@ impl fmt::Display for Matrix {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut matrix_repr = String::new();
         for i in 0..self.row {
-            let start = i*self.col;
-            let end = (i+1)*self.col;
+            let row_start = i*self.col;
+            let row_end = (i+1)*self.col;
 
-            let matrix_row: String = self.content[start..end]
+            let matrix_row: String = self.content[row_start..row_end]
                 .iter()
                 .map(|el| format!("{el:0>2}"))
                 .collect::<Vec<String>>()
@@ -77,7 +77,7 @@ fn get_matrix_from_file(file_name: &str) -> Matrix {
     Matrix {row: row_size, col: col_size, content: matrix}
 }
 
-fn multiply_and_add(vec1: &Vec<i64>, vec2: &Vec<i64>) -> i64 {
+fn multiply_and_add(vec1: &[i64], vec2: &[i64]) -> i64 {
     let mut res: i64 = 0;
 
     for i in 0..vec1.len() {
@@ -99,7 +99,8 @@ fn multiply_matrices(matrix1: Matrix, matrix2: Matrix) -> Matrix {
             // get row from matrix1
             let start = row_from_1*matrix1.col;
             let end = (row_from_1+1)*matrix1.col;
-            let vec1: Vec<i64> = matrix1.content[start..end].iter().cloned().collect();
+            let vec1_slice = &matrix1.content[start..end];
+                // .iter().cloned().collect();
 
             // get column from matrix2
             let mut vec2: Vec<i64> = Vec::new();
@@ -107,7 +108,7 @@ fn multiply_matrices(matrix1: Matrix, matrix2: Matrix) -> Matrix {
                 vec2.push(matrix2.content[i*matrix2.col + col_from_2]);
             }
             
-            result.push(multiply_and_add(&vec1, &vec2));
+            result.push(multiply_and_add(vec1_slice, &vec2));
         }
     }
     
@@ -130,7 +131,7 @@ fn main() {
 
     let result = multiply_matrices(matrix1, matrix2);
 
-    println!("Multiplication of the provided matrices give:\n{result}");
+    println!("Multiplication of the provided matrices give:\n\n{result}");
 }
 
 fn help() {
