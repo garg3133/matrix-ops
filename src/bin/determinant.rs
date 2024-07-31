@@ -40,7 +40,11 @@ fn main() {
         "matrix.txt".to_string()
     };
 
-    let matrix = fs::read_to_string(&file_name).expect(format!("Error while reading file '{file_name}'").as_str());
+    let matrix = fs::read_to_string(&file_name)
+            .expect(format!("Error while reading file '{file_name}'.\n\
+                            Create a new matrix using command: \
+                            'cargo run --bin create --out {file_name}'\n\
+                            Original error").as_str());
 
     // convert matrix to i64 vector
     let matrix: Vec<i64> = matrix
