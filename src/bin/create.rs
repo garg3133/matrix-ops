@@ -24,6 +24,7 @@ fn get_args() -> (String, u32, u32) {
         if next_argv == "--out" {
             if let Some(_) = file_name {
                 // file_name already set
+                help();
                 panic!("--out flag can only be passed once.");
             }
 
@@ -39,6 +40,7 @@ fn get_args() -> (String, u32, u32) {
             if let Some(_) = row_size {
                 if let Some(_) = col_size {
                     // row_size and col_size already set
+                    help();
                     panic!("Too many or wrong arguments passed");
                 } else {
                     col_size = Some(next_argv);
@@ -81,8 +83,8 @@ fn get_args() -> (String, u32, u32) {
         (row_size, col_size)
     };
 
-    let row_size: u32 = row_size.trim().parse().expect("No. of rows in a matrix should be a number.");
-    let col_size: u32 = col_size.trim().parse().expect("No. of columns in a matrix should be a number.");
+    let row_size: u32 = row_size.trim().parse().expect("Matrix row size should be a number.");
+    let col_size: u32 = col_size.trim().parse().expect("Matrix col size should be a number.");
 
     (file_name, row_size, col_size)
 }
@@ -108,5 +110,10 @@ fn main() {
     }
 
     println!("Created a matrix of size {row_size}x{col_size} in '{file_name}'!");
+}
+
+fn help() {
+    println!("USAGE:");
+    println!("  cargo run --bin create [<row_size>] [<col_size>] [--out <file_name>]\n");
 }
 
