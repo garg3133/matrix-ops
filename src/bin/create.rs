@@ -4,16 +4,17 @@ use std::io::{self, Write};
 
 const DEFAULT_MATRIX_FILENAME: &str = "matrix.txt";
 
-fn get_args() -> (String, u32) {
+fn get_args() -> (String, u32, u32) {
     let mut argv_iter = env::args();
 
     // ignore first argv (path to binary)
     argv_iter.next();
 
     let mut file_name: Option<String> = None;
-    let mut size: Option<String> = None;
+    let mut row_size: Option<String> = None;
+    let mut col_size: Option<String> = None;
 
-    // TODO: Improve error handling
+    // TODO: Improve error handling (to panic! or not to panic!)
     loop {
         let next_argv = argv_iter.next().unwrap_or("".to_string());
         if next_argv == "" {
@@ -35,11 +36,15 @@ fn get_args() -> (String, u32) {
                 break;
             }
         } else {
-            if let Some(_) = size {
-                // size already set
-                panic!("Too many or wrong arguments passed");
+            if let Some(_) = row_size {
+                if let Some(_) = col_size {
+                    // row_size and col_size already set
+                    panic!("Too many or wrong arguments passed");
+                } else {
+                    col_size = Some(next_argv);
+                }
             } else {
-                size = Some(next_argv);
+                row_size = Some(next_argv);
             }
         }
     }
@@ -50,35 +55,48 @@ fn get_args() -> (String, u32) {
         DEFAULT_MATRIX_FILENAME.to_string()
     };
 
-    let size: String = if let Some(value) = size {
-        value
+    let (row_size, col_size): (String, String) = if let Some(value1) = row_size {
+        if let Some(value2) = col_size {
+            (value1, value2)
+        } else {
+            (value1.clone(), value1)
+        }
     } else {
-        let mut input = String::new();
-
-        print!("Enter matrix size: ");
+        // get row size from user
+        let mut row_size = String::new();
+        print!("Expected no. of rows in matrix: ");
         io::stdout().flush().unwrap();
-
         io::stdin()
-            .read_line(&mut input)
+            .read_line(&mut row_size)
             .expect("Failed to read input");
 
-        input
-    };
-    let size: u32 = size.trim().parse().expect("Matrix size should be a number.");
+        // get column size from user
+        let mut col_size = String::new();
+        print!("Expected no. of columns in matrix: ");
+        io::stdout().flush().unwrap();
+        io::stdin()
+            .read_line(&mut col_size)
+            .expect("Failed to read input");
 
-    (file_name, size)
+        (row_size, col_size)
+    };
+
+    let row_size: u32 = row_size.trim().parse().expect("No. of rows in a matrix should be a number.");
+    let col_size: u32 = col_size.trim().parse().expect("No. of columns in a matrix should be a number.");
+
+    (file_name, row_size, col_size)
 }
 
 fn main() {
-    let (file_name, size) = get_args();
+    let (file_name, row_size, col_size) = get_args();
 
     // random number generator (for matrix elements)
     let mut thread_rng = rand::thread_rng();
 
     let mut final_matrix = String::new();
 
-    (0..size).for_each(|_| {
-        (0..size).for_each(|_| {
+    (0..row_size).for_each(|_| {
+        (0..col_size).for_each(|_| {
             let num = thread_rng.gen_range(1..100);
             final_matrix.push_str(&format!("{num:0>2} ")); // https://doc.rust-lang.org/rust-by-example/hello/print.html
         });
@@ -89,6 +107,6 @@ fn main() {
         panic!("Error while creating or writing to file '{file_name}': {error}");
     }
 
-    println!("Created a matrix of size {size} in '{file_name}'!");
+    println!("Created a matrix of size {row_size}x{col_size} in '{file_name}'!");
 }
 
