@@ -5,6 +5,14 @@ pub struct Matrix {
 }
 
 impl Matrix {
+    pub fn row(&self) -> usize {
+        self.row
+    }
+
+    pub fn col(&self) -> usize {
+        self.col
+    }
+
     pub fn is_square(&self) -> bool {
         self.row == self.col
     }
