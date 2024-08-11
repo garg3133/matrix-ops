@@ -53,4 +53,32 @@ impl Matrix {
 
         Matrix {row, col, content}
     }
+
+    pub fn multiply(&self, matrix2: &Matrix) -> Matrix {
+        if self.col != matrix2.row {
+            panic!("Incompatible matrices; cannot be multiplied: no. of cols in first matrix should be equal to no. of rows in the second.");
+        }
+
+        let mut result: Vec<i32> = Vec::new();
+
+        for row_from_1 in 0..self.row {
+            for col_from_2 in 0..matrix2.col {
+                // get row from self
+                let start = row_from_1*self.col;
+                let end = (row_from_1+1)*self.col;
+                let vec1_slice = &self.content[start..end];
+
+                // get column from matrix2
+                let mut vec2: Vec<i32> = Vec::new();
+                for i in 0..matrix2.row {
+                    vec2.push(matrix2.content[i*matrix2.col + col_from_2]);
+                }
+                
+                let res = vec1_slice.iter().enumerate().map(|(i, &v1)| v1*vec2[i]).sum();
+                result.push(res);
+            }
+        }
+        
+        Matrix {row: self.row, col: matrix2.col, content: result}
+    }
 }
