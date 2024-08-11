@@ -1,4 +1,5 @@
 use std::fmt;
+use rand::Rng;
 
 pub struct Matrix {
     row: usize,
@@ -44,6 +45,21 @@ impl Matrix {
         }
 
         Matrix {row, col, content}
+    }
+
+    pub fn generate(row: usize, col: usize) -> Matrix {
+        let mut final_matrix: Vec<i32> = Vec::new();
+
+        let mut thread_rng = rand::thread_rng();
+
+        (0..row).for_each(|_| {
+            (0..col).for_each(|_| {
+                let num = thread_rng.gen_range(1..100);
+                final_matrix.push(num);
+            });
+        });
+
+        Matrix {row, col, content: final_matrix}
     }
 
     pub fn multiply(&self, matrix2: &Matrix) -> Matrix {
