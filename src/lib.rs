@@ -89,4 +89,45 @@ impl Matrix {
         
         Matrix {row: self.row, col: matrix2.col, content: result}
     }
+
+    fn calculate_determinant(matrix: &Matrix) -> i64 {
+        let size = matrix.row;
+
+        if size == 1 {
+            return matrix.content[0] as i64;
+        }
+
+        let mut det: i64 = 0;
+        let mut sign = -1;
+
+        for ind in 0..size {
+            let mut child_matrix = Vec::new();
+
+            for i in 1..size { // iterate over rows
+                for j in 0..size { // iterate over cells in each row
+                    if j == ind {
+                        continue;
+                    }
+
+                    child_matrix.push(matrix.content[i*size+j]);
+                }
+            }
+
+            let child_matrix = Matrix::new(size-1, size-1, child_matrix);
+
+            sign *= -1;
+            det += sign * matrix.content[ind] as i64 * Self::calculate_determinant(&child_matrix);
+        }
+
+        det
+    }
+
+    pub fn determinant(&self) -> i64 {
+        if self.row != self.col {
+            panic!("Expected a square matrix.");
+        }
+
+        Self::calculate_determinant(self)
+    }
 }
+
