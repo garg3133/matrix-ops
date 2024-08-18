@@ -26,6 +26,51 @@ impl fmt::Display for Matrix {
     }
 }
 
+pub enum MatrixError {
+    ConversionError(String)
+}
+
+impl TryFrom<String> for Matrix {
+    type Error = MatrixError;
+
+    fn try_from(content: String) -> Result<Self, Self::Error> {
+        let mut row = 0;
+        let mut col = 0;
+        let mut matrix: Vec<i32> = Vec::new();
+
+        let mut errors: Vec<String> = Vec::new();
+
+        let lines = content.split('\n');
+        for line in lines {
+            let mut mat_row: Vec<i32> = line
+                .split(' ')
+                .filter(|s| *s != "")
+                .map(|s| s.parse().map_err(|_| errors.push(format!("Failed to parse to i32: '{s}'"))))
+                .filter_map(|r| r.ok())
+                .collect();
+
+            if errors.len() > 0 {
+                return Err(MatrixError::ConversionError(errors[0].to_owned()));
+            }
+
+            let row_len = mat_row.len();
+            if row_len > 0 {
+                matrix.append(&mut mat_row);
+
+                row += 1;
+                if col == 0 {
+                    col = row_len;
+                } else if col != row_len {
+                    return Err(MatrixError::ConversionError(format!("Error in row {} of matrix; Expected {} elements, found {}",
+                        row, col, row_len)));
+                }
+            }
+        }
+
+        Ok(Matrix {row, col, content: matrix})
+    } 
+}
+
 impl Matrix {
     pub fn row(&self) -> usize {
         self.row
